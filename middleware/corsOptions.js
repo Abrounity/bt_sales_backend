@@ -3,6 +3,8 @@ import cors from "cors";
 
 const allowedOrigins = [
   "https://bt-sales-frontend.vercel.app",
+  "https://www.btsalesindia.com",
+  "https://btsalesindia.com",
   "http://localhost:3000",
   ...(process.env.FRONTEND_URL || "")
     .split(",")
