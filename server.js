@@ -1,5 +1,4 @@
 
-import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
@@ -7,50 +6,36 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import connectDB from "./config/db.js";
+
 import adminRouter from "./routes/admin.js";
 import contactMessagesRouter from "./routes/contactMessages.js";
 import productsRouter from "./routes/products.js";
 import uploadsRouter from "./routes/uploads.js";
 
+// Get current directory
 const currentFile = fileURLToPath(import.meta.url);
 const backendDirectory = path.dirname(currentFile);
 
-dotenv.config({ path: path.join(backendDirectory, ".env") });
+// Load environment variables first
+dotenv.config({
+  path: path.join(backendDirectory, ".env"),
+});
+
+// Import CORS middleware after dotenv
+const { default: corsMiddleware } = await import(
+  "./middleware/corsOptions.js"
+);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Allowed frontend URLs
-const allowedOrigins = [
-  "https://bt-sales-frontend.vercel.app",
-  "http://localhost:3000",
-  ...(process.env.FRONTEND_URL || "")
-    .split(",")
-    .map((origin) => origin.trim())
-    .filter(Boolean),
-];
+// CORS Middleware
+app.use(corsMiddleware);
 
-// CORS configuration
-app.use(
-  cors({
-    origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      console.error("CORS blocked origin:", origin);
-      return callback(new Error("Not allowed by CORS"));
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
-
-// Middleware
+// Body Parser
 app.use(express.json({ limit: "1mb" }));
 
-// Health check
+// Health Check
 app.get("/", (req, res) => {
   res.json({
     success: true,
@@ -79,7 +64,7 @@ app.use((req, res) => {
 // MongoDB Connection
 function connectWithRetry() {
   if (!process.env.MONGODB_URI) {
-    console.error("MONGODB_URI is missing. Configure it in Render Environment Variables.");
+    console.error("MONGODB_URI is missing. Configure it in environment variables.");
     return;
   }
 
@@ -109,7 +94,11 @@ function startServer() {
   connectWithRetry();
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === currentFile) {
+// Initialize Server
+if (
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === currentFile
+) {
   startServer();
 }
 
