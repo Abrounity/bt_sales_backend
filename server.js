@@ -9,6 +9,7 @@ import connectDB from "./config/db.js";
 
 import adminRouter from "./routes/admin.js";
 import contactMessagesRouter from "./routes/contactMessages.js";
+import homepageRouter from "./routes/homepage.js";
 import productsRouter from "./routes/products.js";
 import uploadsRouter from "./routes/uploads.js";
 
@@ -51,6 +52,7 @@ app.get("/", (req, res) => {
 app.use("/api/products", productsRouter);
 app.use("/api/uploads", uploadsRouter);
 app.use("/api/contact", contactMessagesRouter);
+app.use("/api/homepage", homepageRouter);
 app.use("/api/admin", adminRouter);
 
 // 404 Handler

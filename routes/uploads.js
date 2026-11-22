@@ -106,6 +106,12 @@ router.post(
   imageBody,
   (req, res) => uploadImage(req, res, "bt-sales/products", "product image")
 );
+router.post(
+  "/homepage-image",
+  requireAdmin,
+  imageBody,
+  (req, res) => uploadImage(req, res, "bt-sales/homepage", "homepage image")
+);
 
 router.use((error, req, res, next) => {
   if (error?.type === "entity.too.large") {
